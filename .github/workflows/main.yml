@@ -48,4 +48,4 @@ jobs:
         with:
           name: MultiPanel-APK
           path: project/app/build/outputs/apk/debug/app-debug.apk
-3
+
