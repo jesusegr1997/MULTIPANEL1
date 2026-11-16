@@ -1,0 +1,11 @@
+name: MultiPanel APK Builder
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify GitHub Actions
+        run: echo "MultiPanel Actions funciona correctamente"
