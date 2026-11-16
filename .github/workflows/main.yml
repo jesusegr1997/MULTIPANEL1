@@ -41,14 +41,20 @@ jobs:
         run: |
           unzip -o MultiPanel-Android-prototipo-0.1.zip -d project
 
-      - name: Compilar APK
+            - name: Compilar APK
         run: |
-          cd project
+          PROJECT_DIR=$(dirname "$(find project -name settings.gradle.kts -print -quit)")
+          if [ -z "$PROJECT_DIR" ]; then
+            echo "No se encontró el proyecto Android dentro del ZIP"
+            find project -maxdepth 4 -type f
+            exit 1
+          fi
+          echo "Proyecto encontrado en: $PROJECT_DIR"
+          cd "$PROJECT_DIR"
           gradle assembleDebug
 
       - name: Guardar APK
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: MultiPanel-APK
-          path: project/app/build/outputs/apk/debug/app-debug.apk
-
+                    path: project/**/app/build/outputs/apk/debug/app-debug.apk
