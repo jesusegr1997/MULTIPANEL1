@@ -1,11 +1,51 @@
+
 name: MultiPanel APK Builder
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Verify GitHub Actions
-        run: echo "MultiPanel Actions funciona correctamente"
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Instalar Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Instalar herramientas Android
+        run: |
+          sdkmanager "platforms;android-35"
+          sdkmanager "build-tools;35.0.0"
+
+      - name: Instalar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Extraer proyecto
+        run: |
+          unzip -o MultiPanel-Android-prototipo-0.1.zip -d project
+
+      - name: Compilar APK
+        run: |
+          cd project
+          gradle assembleDebug
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MultiPanel-APK
+          path: project/app/build/outputs/apk/debug/app-debug.apk
+
