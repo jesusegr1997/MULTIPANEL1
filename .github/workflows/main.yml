@@ -40,6 +40,7 @@ jobs:
         run: |
           unzip -o MultiPanel-Android-prototipo-0.1.zip -d project
 
+      
       - name: Compilar APK
         run: |
           PROJECT_SETTINGS=$(find project -name settings.gradle.kts -print -quit)
@@ -51,7 +52,30 @@ jobs:
           PROJECT_DIR=$(dirname "$PROJECT_SETTINGS")
           echo "Proyecto encontrado en: $PROJECT_DIR"
           cd "$PROJECT_DIR"
+
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("app/build.gradle.kts")
+          s = p.read_text()
+          if "sourceCompatibility = JavaVersion.VERSION_17" not in s:
+              s = s.replace(
+                  "android {",
+                  """android {
+              compileOptions {
+                  sourceCompatibility = JavaVersion.VERSION_17
+                  targetCompatibility = JavaVersion.VERSION_17
+              }
+              kotlinOptions {
+                  jvmTarget = "17"
+              }
+          """,
+                  1
+              )
+              p.write_text(s)
+          PY
+
           gradle assembleDebug
+
 
       - name: Guardar APK
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
